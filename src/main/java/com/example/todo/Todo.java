@@ -2,39 +2,76 @@ package com.example.todo;
 
 import java.util.Objects;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 public class Todo {
-    @Column(name = "id")
-    private @Id @GeneratedValue Long id;
-    private String title;
-    private Boolean completed;
-    private Integer placing;
 
+    // creation of the model for the table
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id_generator")
+    @SequenceGenerator(name = "id_generator", sequenceName = "id_seq", allocationSize = 1)
+    private Long id; // auto generate ID for H2 using SEQEUNCE
+    private String url;
+    @Column(name = "title")
+    private String title; // set title column
+    @Column(name = "completed")
+    private Boolean completed = Boolean.FALSE; // set completed column
+    @Column(name = "\"order\"")
+    private Long order; // set order column
+
+    // initalise Todo
     public Todo() {
     }
 
-    public Todo(String title) {
-        this.title = title;
+    // get id of Todo entry
+    public Long getId() {
+        return id;
     }
 
-    public Todo(Long id, String title, Boolean completed, Integer placing) {
-        this.id = id;
-        this.title = title;
-        this.completed = completed;
-        this.placing = placing;
+    // get URL of Todo entry
+    public String getUrl() {
+        return url + "/" + id;
     }
 
+    // get title of Todo entry
     public String getTitle() {
         return title;
     }
 
+    // get completion status of ToDo entry
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    // get order of Todo entry
+    public Long getOrder() {
+        return order;
+    }
+
+    // change the Id of the entry
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    // change the URL of the entry
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    // change the title of the entry
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    // set completed status of the entry
+    public void setCompleted(Boolean completed) {
+        this.completed = completed == null ? false : completed;
+    }
+
+    // set order of the entry
+    public void setOrder(Long order) {
+        this.order = order;
     }
 
     @Override
@@ -43,56 +80,14 @@ public class Todo {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-
         Todo todo = (Todo) o;
-
-        if (id != todo.id)
-            return false;
-
-        return true;
+        return Objects.equals(id, todo.id) && Objects.equals(url, todo.url) &&
+                Objects.equals(title, todo.title) && Objects.equals(completed, todo.completed) &&
+                Objects.equals(order, todo.order);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id, this.title, this.completed, this.placing);
-    }
-
-    @Override
-    public String toString() {
-        return "Todo{" + "id=" + this.id + ", title='" + this.title + '\'' + ", completed=" + this.completed
-                + ", placing=" + this.placing + '}';
-    }
-
-    public boolean isCompleted() {
-        return nonNull(completed, false);
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
-
-    public int getPlacing() {
-        return nonNull(placing, 0);
-    }
-
-    public void setPlacing(Integer placing) {
-        this.placing = placing;
-    }
-
-    public Todo merge(Todo newTodo) {
-        return new Todo(id, nonNull(newTodo.title, title), nonNull(newTodo.completed, completed),
-                nonNull(newTodo.placing, placing));
-    }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    private <T> T nonNull(T value, T defaultValue) {
-        return value == null ? defaultValue : value;
+        return Objects.hash(id, url, title, completed, order);
     }
 }
